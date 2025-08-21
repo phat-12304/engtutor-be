@@ -6,6 +6,9 @@ const Services = require("../services/services");
 const UploadFile = require("../services/upload");
 const UserController = require("../controllers/UserController");
 const TutorController = require("../controllers/TutorController");
+const PackageController = require("../controllers/PackageController");
+const ScheduleController = require("../controllers/ScheduleController");
+const OrderController = require("../controllers/OrderController");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -34,5 +37,21 @@ router.put("/users", protect, UserController.update);
 router.get("/tutors", TutorController.getAll);
 router.post("/tutors", TutorController.store);
 router.put("/tutors/:id", TutorController.update);
+
+/* PACKAGE */
+router.get("/packages", PackageController.getAll);
+router.post("/packages", PackageController.store);
+router.put("/packages/:id", PackageController.update);
+
+/* SCHEDULE */
+router.get("/schedules", ScheduleController.getAll);
+router.post("/schedules", ScheduleController.store);
+router.put("/schedules/:id", ScheduleController.update);
+router.get("/schedules-try/:id", ScheduleController.getTrySchedules);
+router.get("/schedules-by/:id", ScheduleController.getSchedulesOfTutor);
+
+/* ORDER */
+router.get("/orders", OrderController.getAll);
+router.post("/orders", OrderController.store);
 
 module.exports = router;

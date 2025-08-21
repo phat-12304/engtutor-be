@@ -17,12 +17,11 @@ class UserController {
     }
   }
   async store(req, res) {
-    const { email, password, repassword } = req.body;
-    if (password != repassword)
-      return FormatResponse.error(res, "Mật khẩu không trùng khớp!");
-    // check user exists
+    const { email, password } = req.body;
+
     const user = await User.findOne({ email });
     if (user) return FormatResponse.error(res, "Tài khoản đã tồn tại!");
+
     try {
       const user = await User.create({ email, password });
       return FormatResponse.success(res, user, "Đăng ký thành công!");

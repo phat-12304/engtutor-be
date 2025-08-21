@@ -1,46 +1,49 @@
-const Research = require("../models/Research");
+const Tutor = require("../models/Tutor");
 const FormatResponse = require("../services/response");
 const Paginate = require("../services/paginate");
 const User = require("../models/User");
 const paginate = require("../services/paginate");
+const UploadFile = require("../services/upload");
+const Services = require("../services/services");
+const path = require("path");
 
-class ResearchController {
+class TutorController {
   async getAll(req, res) {
-    const projection = { keywords: 1 };
     const sort = { createdAt: -1 };
-    const query = { is_public: true };
     try {
-      const data = await Paginate.main(req, Research, {
-        query,
-        projection,
-        sort,
-      });
+      const data = await Paginate.main(req, Tutor, { sort });
       return FormatResponse.pagination(res, data.data, data.paginate);
     } catch (error) {
       return FormatResponse.failure(res, error);
     }
   }
   async store(req, res) {
-    const userId = req.id_user;
-    let { keywords, contents } = req.body;
+    let { name, image, nation } = req.body;
 
-    const user = await User.findOne({ _id: userId });
-    if (!user)
-      return FormatResponse.error(res, "Không tìm thấy người dùng này!");
-
-    if (keywords == "")
+    if (name == "")
       return FormatResponse.error(res, "Không được để trống từ khóa!");
-    if (contents == "")
-      return FormatResponse.error(res, "Không được để trống nội dung!");
-
-    if (req.query.clone) keywords += ` - ${user.username}`;
 
     try {
-      const data = await Research.create({
-        keywords,
-        contents,
-        id_user: userId,
+      let filename;
+
+      if (image) {
+        filename = UploadFile.generateFilename(
+          Services.gen_auth_token(name),
+          "tutor"
+        );
+      }
+
+      const data = await Tutor.create({
+        name,
+        image: filename ?? "clone.jpg",
+        nation,
       });
+      if (filename) {
+        await UploadFile.uploadFileFromLink(
+          String(image).trim(),
+          path.join(__dirname, "..", "assets", "images", "tutors", filename)
+        );
+      }
       return FormatResponse.success(res, data);
     } catch (error) {
       return FormatResponse.failure(res, error);
@@ -59,49 +62,63 @@ class ResearchController {
     }
   }
   async update(req, res) {
-    const userId = req.id_user;
-
-    const user = await User.findOne({ _id: userId });
-    if (!user)
-      return FormatResponse.error(res, "Không tìm thấy người dùng này!");
-
     let update = {};
-    if (!req.params.id)
-      return FormatResponse.error(res, "Không có mã nghiên cứu!");
+    let hasImage = false;
+    if (!req.params.id) return FormatResponse.error(res, "Không có mã gia sư!");
 
-    if (req.body.keywords && req.body.keywords != "") {
-      const keywords = req.body.keywords;
-      update = { ...update, keywords };
+    if (req.body.name && req.body.name != "") {
+      const name = req.body.name;
+      update = { ...update, name };
     }
 
-    if (req.body.contents && req.body.contents != "") {
-      const contents = req.body.contents;
-      update = { ...update, contents };
+    if (req.body.nation && req.body.nation != "") {
+      const nation = req.body.nation;
+      update = { ...update, nation };
+    }
+
+    if (req.body.image && req.body.image != "") {
+      update = { ...update, image: req.body.image };
+      hasImage = true;
     }
 
     if (Object.keys(update).length > 0) {
       try {
-        const research = await Research.findOne({ _id: req.params.id });
-        if (!research)
-          return FormatResponse.error(res, "Không tìm thấy nghiên cứu!");
+        let filename;
+        const pathImage = path.join(
+          __dirname,
+          "..",
+          "assets",
+          "images",
+          "tutors"
+        );
 
-        if (research.id_user != userId) {
-          return FormatResponse.error(
-            res,
-            "Không quyền thực hiện thao tác này!",
-            403
+        const tutor = await Tutor.findOne({ _id: req.params.id });
+        if (!tutor) return FormatResponse.error(res, "Không tìm thấy gia sư!");
+
+        if (hasImage) {
+          UploadFile.deleteFile(path.join(pathImage, tutor.image));
+          filename = UploadFile.generateFilename(
+            Services.gen_auth_token(tutor.name),
+            "tutor"
           );
+          update = { ...update, image: filename };
         }
 
-        const data = await Research.findByIdAndUpdate(research.id, update, {
+        const data = await Tutor.findByIdAndUpdate(tutor.id, update, {
           new: true,
         });
+        if (hasImage) {
+          await UploadFile.uploadFileFromLink(
+            String(req.body.image).trim(),
+            path.join(pathImage, filename)
+          );
+        }
         return FormatResponse.success(res, data);
       } catch (error) {
         return FormatResponse.failure(res, error);
       }
     }
-    return FormatResponse.success(res, {});
+    return FormatResponse.success(res, {}, "Không có gì để cập nhật!");
   }
   async destroy(req, res) {
     const userId = req.id_user;
@@ -198,4 +215,4 @@ class ResearchController {
     }
   }
 }
-module.exports = new ResearchController();
+module.exports = new TutorController();

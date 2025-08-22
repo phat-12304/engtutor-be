@@ -24,14 +24,14 @@ class PackageController {
     if (price == "")
       return FormatResponse.error(res, "Không được để trống giá!");
 
-    if (popular == "")
-      return FormatResponse.error(res, "Không được để trống trạng thái!");
-
-    if (is_try == "")
-      return FormatResponse.error(res, "Không được để trống trạng thái thử!");
-
     try {
-      const data = await Tutor.create({ name, image, price, popular, is_try });
+      const data = await Package.create({
+        name,
+        desc,
+        price,
+        popular,
+        is_try,
+      });
       return FormatResponse.success(res, data);
     } catch (error) {
       return FormatResponse.failure(res, error);
@@ -68,12 +68,12 @@ class PackageController {
       update = { ...update, price };
     }
 
-    if (req.body.popular && req.body.popular != "") {
+    if (req.body.hasOwnProperty("popular")) {
       const popular = req.body.popular;
       update = { ...update, popular };
     }
 
-    if (req.body.is_try && req.body.is_try != "") {
+    if (req.body.hasOwnProperty("is_try")) {
       const is_try = req.body.is_try;
       update = { ...update, is_try };
     }

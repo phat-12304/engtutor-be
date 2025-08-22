@@ -9,7 +9,7 @@ class Paginate {
   async main(
     req,
     model,
-    { query = {}, populate = [], projection = {}, sort = {} } = {}
+    { query = {}, populate = [], projection = {}, sort = {}, keySearch = "name" } = {}
   ) {
     const pageNumber = parseInt(req.query.page) || 1;
     const perPage = parseInt(req.query.limit) || 12;
@@ -18,7 +18,7 @@ class Paginate {
 
     if (searchKeyword) {
       const regex = new RegExp(searchKeyword, "i");
-      query = { ...query, keywords: regex };
+      query = { ...query, [keySearch]: regex };
     }
 
     const totalRecords = await model.countDocuments(query);

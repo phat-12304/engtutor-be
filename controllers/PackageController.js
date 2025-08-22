@@ -15,13 +15,13 @@ class PackageController {
   async store(req, res) {
     let { name, desc, price, popular, is_try } = req.body;
 
-    if (name == "")
+    if (!req.body.hasOwnProperty("name"))
       return FormatResponse.error(res, "Không được để trống từ khóa!");
 
-    if (desc == "")
+    if (!req.body.hasOwnProperty("desc"))
       return FormatResponse.error(res, "Không được để trống mô tả!");
 
-    if (price == "")
+    if (!req.body.hasOwnProperty("price"))
       return FormatResponse.error(res, "Không được để trống giá!");
 
     try {

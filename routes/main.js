@@ -38,11 +38,13 @@ router.get("/tutors", TutorController.getAll);
 router.get("/tutors/:id", TutorController.getOne);
 router.post("/tutors", TutorController.store);
 router.put("/tutors/:id", TutorController.update);
+router.delete("/tutors/:id", TutorController.destroy);
 
 /* PACKAGE */
 router.get("/packages", PackageController.getAll);
 router.post("/packages", PackageController.store);
 router.put("/packages/:id", PackageController.update);
+router.delete("/packages/:id", PackageController.destroy);
 
 /* SCHEDULE */
 router.get("/schedules", ScheduleController.getAll);

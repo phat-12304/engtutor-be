@@ -90,5 +90,14 @@ class PackageController {
     }
     return FormatResponse.success(res, {}, "Không có gì để cập nhật!");
   }
+  async destroy(req, res) {
+    const id = req.params.id;
+    try {
+      await Package.findByIdAndDelete(id);
+      return FormatResponse.delete(res, "Xóa thành công!");
+    } catch (error) {
+      return FormatResponse.failure(res, error);
+    }
+  }
 }
 module.exports = new PackageController();

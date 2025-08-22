@@ -35,6 +35,7 @@ router.put("/users", protect, UserController.update);
 
 /* TUTOR */
 router.get("/tutors", TutorController.getAll);
+router.get("/tutors/:id", TutorController.getOne);
 router.post("/tutors", TutorController.store);
 router.put("/tutors/:id", TutorController.update);
 

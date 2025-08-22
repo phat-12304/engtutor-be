@@ -51,10 +51,10 @@ class TutorController {
   }
   async getOne(req, res) {
     if (!req.params.id)
-      return FormatResponse.error(res, "Không có mã nghiên cứu!");
+      return FormatResponse.error(res, "Không có mã giáo viên!");
     try {
-      const data = await Research.findOne({ _id: req.params.id });
-      if (!data) return FormatResponse.error(res, "Không tìm thấy nghiên cứu!");
+      const data = await Tutor.findOne({ _id: req.params.id });
+      if (!data) return FormatResponse.error(res, "Không tìm thấy giáo viên!");
 
       return FormatResponse.success(res, data);
     } catch (error) {

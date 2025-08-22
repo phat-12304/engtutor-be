@@ -15,13 +15,13 @@ class OrderController {
   async store(req, res) {
     let { price, note, id_package, id_user } = req.body;
 
-    if (price == "")
+    if (!req.body.hasOwnProperty("price"))
       return FormatResponse.error(res, "Không được để trống giá!");
 
-    if (id_package == "")
+    if (!req.body.hasOwnProperty("id_package"))
       return FormatResponse.error(res, "Không được để trống mã gói!");
 
-    if (id_user == "")
+    if (!req.body.hasOwnProperty("id_user"))
       return FormatResponse.error(res, "Không được để trống mã người dùng!");
 
     try {
